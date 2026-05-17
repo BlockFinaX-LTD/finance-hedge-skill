@@ -44,16 +44,74 @@ dynamic-hedging/
     └── em_adjustments.py        # Merton jump-diffusion, peg-break decomposition
 ```
 
-## Setup
+## Installation
 
-1. Clone into your Claude Code skills directory:
-   ```powershell
-   cd $env:USERPROFILE\.claude\skills
-   git clone <this-repo-url> dynamic-hedging
+### Prerequisites
+
+- [Claude Code](https://claude.com/claude-code) installed (CLI, desktop, or IDE extension)
+- Git
+- Python 3.9+ on `PATH` if you want to run the pricing scripts (pure stdlib — no pip install needed)
+
+### Install the skill
+
+Claude Code auto-discovers skills in `~/.claude/skills/` (user scope, available in every project) or `<project>/.claude/skills/` (project scope, only in that project). Pick one and clone there.
+
+**Windows (PowerShell):**
+```powershell
+# user scope — recommended
+mkdir $env:USERPROFILE\.claude\skills -Force | Out-Null
+cd $env:USERPROFILE\.claude\skills
+git clone https://github.com/BlockFinaX-LTD/finance-claude-skill.git dynamic-hedging
+```
+
+**macOS / Linux:**
+```bash
+# user scope — recommended
+mkdir -p ~/.claude/skills
+cd ~/.claude/skills
+git clone https://github.com/BlockFinaX-LTD/finance-claude-skill.git dynamic-hedging
+```
+
+The directory **must be named `dynamic-hedging`** so the path matches the `name:` field in `SKILL.md`.
+
+### Configure source-book paths (one-time)
+
+Two reference files were authored against specific paths on the original machine. After cloning, you may need to update them so they point to your own paths:
+
+- `SKILL.md` and `references/hull_navigator.md` reference Hull's book at `c:\Users\ADMIN\rift\financeskill\derivatives.md`. The skill still works without it — all 11 Hull distillation files stand alone — but **verbatim quote lookups** from Hull's source require the file. If you have Hull's textbook in markdown, place it somewhere local and update these two files with the new absolute path (or delete the references entirely).
+- Taleb's source (`references/dynamic_hedging_full.md`) is **included in the repo**, so no action needed for Taleb.
+
+### Verify
+
+1. Restart Claude Code (or reload its skill registry).
+2. In a new conversation, ask:
    ```
-2. Drop your own copy of the Taleb source markdown into `references/dynamic_hedging_full.md` — the skill's chapter navigator references it by line range.
-3. (Optional) If you have Hull's textbook in markdown, place it somewhere on disk and update the Hull source path in `SKILL.md` and `references/hull_navigator.md` to match. The skill is fully usable without Hull's source — the Hull distillation files stand alone — but verbatim-quote lookups require the source.
-4. Reload Claude Code (skills auto-load from `~/.claude/skills/`). Verify with `/help` — the skill should appear in the list.
+   /list-skills
+   ```
+   or simply:
+   ```
+   what skills do you have available?
+   ```
+3. You should see `dynamic-hedging` in the listing. Test with a sample query:
+   ```
+   Price a 3-month ATM call on a stock at $100, vol 25%, risk-free 5%.
+   ```
+   Claude should invoke the skill, use `scripts/bs_pricer.py`, and return premium plus Greeks.
+
+### Updating
+
+```bash
+cd ~/.claude/skills/dynamic-hedging
+git pull
+```
+Claude Code reloads the skill on next session start.
+
+### Uninstalling
+
+```bash
+rm -rf ~/.claude/skills/dynamic-hedging         # macOS / Linux
+Remove-Item -Recurse -Force $env:USERPROFILE\.claude\skills\dynamic-hedging   # Windows
+```
 
 ## Scripts
 
